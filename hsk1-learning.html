@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSK Chinese Learning - Sofia</title>
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 90px;
+            background: linear-gradient(180deg, #1e3a5f, #0d1b2a);
+            padding: 15px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            color: #f59e0b;
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .level-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .level-btn.locked {
+            background: #374151;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .level-btn.unlocked {
+            background: #4ade80;
+            color: white;
+        }
+
+        .level-btn .lock-icon {
+            font-size: 10px;
+            position: absolute;
+            top: 3px;
+            right: 3px;
+        }
+
+        .level-btn .level-name { font-size: 12px; }
+        .level-btn .level-progress { font-size: 9px; opacity: 0.8; }
+
+        /* Daily Slang Section - Bottom */
+        .daily-slang-section {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .daily-slang-section h3 {
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slang-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .slang-grid { grid-template-columns: 1fr; }
+        }
+
+        .slang-grid-item {
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            text-align: center;
+        }
+
+        .slang-grid-item:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .slang-grid-item .slang-char {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .slang-grid-item .slang-pin {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .slang-grid-item .slang-mean {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-bottom: 10px;
+        }
+
+        .slang-grid-item .slang-learn-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .slang-grid-item .slang-learn-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .slang-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .slang-card:hover { background: rgba(255,255,255,0.25); transform: scale(1.02); }
+        .slang-card .slang-char { font-size: 22px; font-weight: bold; }
+        .slang-card .slang-pin { font-size: 11px; opacity: 0.9; margin-top: 4px; }
+        .slang-card .slang-mean { font-size: 10px; opacity: 0.85; margin-top: 4px; }
+        .slang-card .slang-mn { font-size: 9px; opacity: 0.7; margin-top: 2px; }
+
+        .slang-learn-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 6px 15px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .slang-learn-btn:hover { background: rgba(255,255,255,0.5); }
+
+        .slang-bank-btn {
+            background: rgba(0,0,0,0.2);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .slang-bank-btn:hover { background: rgba(0,0,0,0.3); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* Header - Smaller */
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 { font-size: 1.1rem; white-space: nowrap; }
+
+        .progress-wrapper { flex: 1; }
+
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 2px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            height: 14px;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 10px 8px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #374151;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        /* Learn Section */
+        .learn-container {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .learn-container { grid-template-columns: 1fr; }
+        }
+
+        .word-display { text-align: center; }
+        .word-image { font-size: 45px; margin-bottom: 8px; }
+        .chinese-char {
+            font-size: 68px;
+            color: #1f2937;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .chinese-char:hover { transform: scale(1.1); }
+        .pinyin { font-size: 20px; color: #667eea; margin: 8px 0; }
+
+        .translations {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .translation {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .english { background: #e0e7ff; color: #4338ca; }
+        .mongolian { background: #fef3c7; color: #b45309; }
+
+        .example {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+            text-align: left;
+        }
+
+        .example-chinese { font-size: 16px; color: #1f2937; margin-bottom: 4px; }
+        .example-pinyin { font-size: 11px; color: #667eea; margin-bottom: 4px; }
+        .example-english { font-size: 11px; color: #6b7280; }
+
+        .sound-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .sound-btn {
+            padding: 6px 14px;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .sound-btn:hover { background: #667eea; color: white; }
+
+        /* Stroke Section */
+        .stroke-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stroke-section h4 { margin-bottom: 8px; color: #374151; font-size: 13px; }
+
+        .stroke-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .stroke-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            position: relative;
+        }
+
+        .stroke-box .char-label {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .stroke-buttons {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .stroke-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .stroke-btn.animate { background: #667eea; color: white; }
+        .stroke-btn.quiz { background: #22c55e; color: white; }
+        .stroke-btn.reset { background: #e5e7eb; color: #374151; }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-secondary { background: #e5e7eb; color: #374151; }
+        .btn-success { background: #22c55e; color: white; }
+
+        .word-counter { color: #6b7280; font-size: 0.8rem; margin-top: 8px; text-align: center; }
+
+        /* Story Section with Ruby Pinyin */
+        .story-section { line-height: 2.8; }
+        .story-section h3 { margin-bottom: 12px; color: #374151; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .pinyin-toggle-story {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .toggle-small {
+            width: 40px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .toggle-small.active { background: #4ade80; }
+
+        .toggle-small::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+        }
+
+        .toggle-small.active::after { left: 22px; }
+
+        .story-text {
+            font-size: 20px;
+            color: #1f2937;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        ruby {
+            ruby-position: over;
+            -webkit-ruby-position: before;
+        }
+
+        rt {
+            font-size: 10px;
+            color: #667eea;
+        }
+
+        rt.hidden { visibility: hidden; }
+
+        .story-char {
+            cursor: pointer;
+            padding: 1px;
+            border-radius: 3px;
+            transition: background 0.2s;
+            position: relative;
+            display: inline;
+        }
+
+        .story-char:hover { background: #e0e7ff; }
+
+        .story-translation {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .translation-en {
+            font-size: 13px;
+            color: #4338ca;
+            margin-bottom: 8px;
+        }
+
+        .translation-mn {
+            font-size: 13px;
+            color: #b45309;
+        }
+
+        /* Quiz/Exam */
+        .quiz-option {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover { border-color: #667eea; }
+        .quiz-option.correct { border-color: #22c55e; background: #dcfce7; }
+        .quiz-option.wrong { border-color: #ef4444; background: #fee2e2; }
+
+        .exam-result { text-align: center; padding: 25px; }
+        .exam-score { font-size: 55px; font-weight: bold; color: #667eea; }
+        .exam-message { font-size: 16px; margin: 15px 0; }
+
+        .hidden { display: none; }
+
+        /* Word List with Numbers */
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 6px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .word-item {
+            background: #f3f4f6;
+            padding: 8px 4px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .word-item:hover { background: #e5e7eb; }
+        .word-item.learned { background: #dcfce7; border: 2px solid #22c55e; }
+        .word-item .num {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 8px;
+            color: #9ca3af;
+            font-weight: bold;
+        }
+        .word-item .char { font-size: 20px; }
+        .word-item .pin { font-size: 8px; color: #667eea; }
+
+        /* Slang Bank Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-header h3 { color: #374151; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .bank-card {
+            background: #fef3c7;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .bank-card:hover { background: #fde68a; }
+        .bank-card .char { font-size: 18px; font-weight: bold; }
+        .bank-card .pin { font-size: 10px; color: #92400e; }
+        .bank-card .mean { font-size: 9px; color: #78350f; margin-top: 3px; }
+
+        @media (max-width: 600px) {
+            .sidebar { width: 70px; padding: 10px 5px; }
+            .level-btn { width: 45px; height: 45px; }
+            .level-btn .level-name { font-size: 10px; }
+            .chinese-char { font-size: 52px; }
+            header { flex-direction: column; gap: 8px; }
+            header h1 { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="level-btn active" id="level1Btn" onclick="selectLevel(1)">
+            <span class="level-name">HSK1</span>
+            <span class="level-progress" id="level1Progress">0%</span>
+        </div>
+        <div class="level-btn locked" id="level2Btn" onclick="selectLevel(2)">
+            <span class="lock-icon">🔒</span>
+            <span class="level-name">HSK2</span>
+            <span class="level-progress">Locked</span>
+        </div>
+        <div class="level-btn locked" id="level3Btn" onclick="selectLevel(3)">
+            <span class="lock-icon">🔒</span>
+            <span class="level-name">HSK3</span>
+            <span class="level-progress">Locked</span>
+        </div>
+        <div class="level-btn locked" id="level4Btn" onclick="selectLevel(4)">
+            <span class="lock-icon">🔒</span>
+            <span class="level-name">HSK4</span>
+            <span class="level-progress">Locked</span>
+        </div>
+
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <h1 id="headerTitle">HSK1</h1>
+                <div class="progress-wrapper">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar">0%</div>
+                    </div>
+                    <div class="stats">
+                        <span id="learnedCount">0 learned</span>
+                        <span id="totalWords">/ 150 words</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('learn')">📖 Learn & Write</button>
+                <button class="nav-tab" onclick="showSection('story')">📚 Story</button>
+                <button class="nav-tab" onclick="showSection('quiz')">📝 Quiz</button>
+                <button class="nav-tab" onclick="showSection('list')">📋 All Words</button>
+                <button class="nav-tab" onclick="showSection('exam')">🎓 Exam</button>
+            </div>
+
+            <!-- Learn & Write Section -->
+            <div id="learnSection" class="card">
+                <div class="learn-container">
+                    <div class="word-display">
+                        <div class="word-image" id="wordImage"></div>
+                        <div class="chinese-char" id="chineseChar" onclick="speakChar()"></div>
+                        <div class="pinyin" id="pinyin"></div>
+                        <div class="translations">
+                            <span class="translation english" id="english"></span>
+                            <span class="translation mongolian" id="mongolian"></span>
+                        </div>
+                        <div class="example">
+                            <div class="example-chinese" id="exampleChinese" onclick="speakExample()"></div>
+                            <div class="example-pinyin" id="examplePinyin"></div>
+                            <div class="example-english" id="exampleEnglish"></div>
+                        </div>
+                        <div class="sound-buttons">
+                            <button class="sound-btn" onclick="speakChar()">🔊 Word</button>
+                            <button class="sound-btn" onclick="speakExample()">🔊 Sentence</button>
+                        </div>
+                    </div>
+                    <div class="stroke-section">
+                        <h4>✍️ Stroke Order</h4>
+                        <div class="stroke-container" id="stroke-container"></div>
+                        <div class="stroke-buttons">
+                            <button class="stroke-btn animate" onclick="animateAllStrokes()">▶ Play All</button>
+                            <button class="stroke-btn quiz" onclick="quizAllStrokes()">✏ Quiz</button>
+                            <button class="stroke-btn reset" onclick="resetAllStrokes()">↺ Reset</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-counter" id="wordCounter"></div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary" onclick="prevWord()">← Prev</button>
+                    <button class="btn btn-success" onclick="markLearned()">✓ I Know This</button>
+                    <button class="btn btn-primary" onclick="nextWord()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Story Section -->
+            <div id="storySection" class="card hidden">
+                <div class="story-section">
+                    <h3>
+                        <span id="storyTitle">📖 HSK1 Story</span>
+                        <div class="pinyin-toggle-story">
+                            <span>Pinyin:</span>
+                            <div class="toggle-small active" id="storyPinyinToggle" onclick="toggleStoryPinyin()"></div>
+                        </div>
+                    </h3>
+                    <div class="story-text" id="storyText"></div>
+                    <div class="story-translation" id="storyTranslation"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div id="quizSection" class="card hidden">
+                <div id="quizContent">
+                    <h2 style="text-align:center; margin-bottom:15px;">What does this mean?</h2>
+                    <div class="chinese-char" id="quizChar" style="text-align:center;"></div>
+                    <div id="quizOptions"></div>
+                    <p style="text-align:center; color:#6b7280; margin-top:12px;">Question <span id="quizProgress">1</span>/10</p>
+                </div>
+                <div id="quizResult" class="exam-result hidden">
+                    <div style="font-size:55px;" id="quizEmoji"></div>
+                    <div class="exam-score" id="quizScore"></div>
+                    <p id="quizMessage"></p>
+                    <button class="btn btn-primary" onclick="startQuiz()" style="margin-top:15px;">Try Again</button>
+                </div>
+            </div>
+
+            <!-- Word List Section -->
+            <div id="listSection" class="card hidden">
+                <h3 style="margin-bottom:12px;">All HSK1 Words</h3>
+                <div class="word-list" id="wordList"></div>
+            </div>
+
+            <!-- Exam Section -->
+            <div id="examSection" class="card hidden">
+                <div id="examContent">
+                    <h2 style="text-align:center; margin-bottom:8px;">🎓 HSK1 Final Exam</h2>
+                    <p style="text-align:center; color:#6b7280; margin-bottom:15px;">Pass with 80% to unlock HSK2!</p>
+                    <div class="chinese-char" id="examChar" style="text-align:center;"></div>
+                    <div id="examOptions"></div>
+                    <p style="text-align:center; color:#6b7280; margin-top:12px;">Question <span id="examProgress">1</span>/20</p>
+                </div>
+                <div id="examResult" class="exam-result hidden">
+                    <div style="font-size:70px;" id="examEmoji"></div>
+                    <div class="exam-score" id="examScore"></div>
+                    <p class="exam-message" id="examMessage"></p>
+                    <button class="btn btn-primary" id="examRetryBtn" onclick="startExam()" style="margin-top:15px;">Try Again</button>
+                    <button class="btn btn-success hidden" id="examNextBtn" onclick="unlockNextLevel()" style="margin-top:15px;">Unlock HSK2 →</button>
+                </div>
+                <div id="examStart" style="text-align:center;">
+                    <p style="margin-bottom:15px;">Learn all words before taking the exam.</p>
+                    <p style="font-size:22px; margin-bottom:15px;"><span id="examReadyCount">0</span> / <span id="examTotalCount">150</span> words learned</p>
+                    <button class="btn btn-primary" id="startExamBtn" onclick="startExam()" disabled>Start Exam</button>
+                </div>
+            </div>
+
+            <!-- Daily Slang Section - Bottom -->
+            <div class="daily-slang-section">
+                <h3>
+                    <span>🗣️ Daily Slang Words</span>
+                    <button class="slang-bank-btn" onclick="openSlangBank()">📚 My Bank (<span id="slangBankCount">0</span>)</button>
+                </h3>
+                <div class="slang-grid" id="slangGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slang Bank Modal -->
+    <div class="modal-overlay" id="slangModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📚 My Slang Bank</h3>
+                <button class="modal-close" onclick="closeSlangBank()">×</button>
+            </div>
+            <div class="bank-grid" id="slangBankGrid"></div>
+            <p id="emptyBankMsg" style="text-align:center; color:#6b7280; padding:20px;">Learn slang words from the sidebar to add them here!</p>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentLevel = 1;
+        let currentIndex = 0;
+        let writer = null;
+        let showStoryPinyin = true;
+        let learnedWords = JSON.parse(localStorage.getItem('hskLearned') || '{}');
+        let slangBank = JSON.parse(localStorage.getItem('slangBank') || '[]');
+        let unlockedLevels = JSON.parse(localStorage.getItem('unlockedLevels') || '[1, 2, 3, 4]');
+        let currentSlangIndices = JSON.parse(localStorage.getItem('currentSlangIndices') || '[]');
+
+        // HSK1 Words (150)
+        const hskWords = {
+            1: [
+                { char: "我", pinyin: "wǒ", english: "I, me", mongolian: "Би", image: "👤", example: "我是学生。", exPinyin: "Wǒ shì xuésheng.", exEnglish: "I am a student." },
+                { char: "你", pinyin: "nǐ", english: "you", mongolian: "Чи", image: "👉", example: "你好吗？", exPinyin: "Nǐ hǎo ma?", exEnglish: "How are you?" },
+                { char: "他", pinyin: "tā", english: "he", mongolian: "Тэр (эр)", image: "👨", example: "他是老师。", exPinyin: "Tā shì lǎoshī.", exEnglish: "He is a teacher." },
+                { char: "她", pinyin: "tā", english: "she", mongolian: "Тэр (эм)", image: "👩", example: "她很漂亮。", exPinyin: "Tā hěn piàoliang.", exEnglish: "She is beautiful." },
+                { char: "我们", pinyin: "wǒmen", english: "we", mongolian: "Бид", image: "👥", example: "我们是朋友。", exPinyin: "Wǒmen shì péngyou.", exEnglish: "We are friends." },
+                { char: "好", pinyin: "hǎo", english: "good", mongolian: "Сайн", image: "👍", example: "你好！", exPinyin: "Nǐ hǎo!", exEnglish: "Hello!" },
+                { char: "是", pinyin: "shì", english: "to be", mongolian: "Байх", image: "✓", example: "我是中国人。", exPinyin: "Wǒ shì Zhōngguó rén.", exEnglish: "I am Chinese." },
+                { char: "不", pinyin: "bù", english: "not", mongolian: "Үгүй", image: "❌", example: "我不喝咖啡。", exPinyin: "Wǒ bù hē kāfēi.", exEnglish: "I don't drink coffee." },
+                { char: "一", pinyin: "yī", english: "one", mongolian: "Нэг", image: "1️⃣", example: "一个苹果。", exPinyin: "Yī gè píngguǒ.", exEnglish: "One apple." },
+                { char: "二", pinyin: "èr", english: "two", mongolian: "Хоёр", image: "2️⃣", example: "二本书。", exPinyin: "Èr běn shū.", exEnglish: "Two books." },
+                { char: "三", pinyin: "sān", english: "three", mongolian: "Гурав", image: "3️⃣", example: "三个人。", exPinyin: "Sān gè rén.", exEnglish: "Three people." },
+                { char: "四", pinyin: "sì", english: "four", mongolian: "Дөрөв", image: "4️⃣", example: "四月。", exPinyin: "Sì yuè.", exEnglish: "April." },
+                { char: "五", pinyin: "wǔ", english: "five", mongolian: "Тав", image: "5️⃣", example: "五点。", exPinyin: "Wǔ diǎn.", exEnglish: "5 o'clock." },
+                { char: "六", pinyin: "liù", english: "six", mongolian: "Зургаа", image: "6️⃣", example: "六月。", exPinyin: "Liù yuè.", exEnglish: "June." },
+                { char: "七", pinyin: "qī", english: "seven", mongolian: "Долоо", image: "7️⃣", example: "七天。", exPinyin: "Qī tiān.", exEnglish: "Seven days." },
+                { char: "八", pinyin: "bā", english: "eight", mongolian: "Найм", image: "8️⃣", example: "八点。", exPinyin: "Bā diǎn.", exEnglish: "8 o'clock." },
+                { char: "九", pinyin: "jiǔ", english: "nine", mongolian: "Ес", image: "9️⃣", example: "九月。", exPinyin: "Jiǔ yuè.", exEnglish: "September." },
+                { char: "十", pinyin: "shí", english: "ten", mongolian: "Арав", image: "🔟", example: "十块钱。", exPinyin: "Shí kuài qián.", exEnglish: "Ten yuan." },
+                { char: "人", pinyin: "rén", english: "person", mongolian: "Хүн", image: "🧑", example: "中国人。", exPinyin: "Zhōngguó rén.", exEnglish: "Chinese person." },
+                { char: "大", pinyin: "dà", english: "big", mongolian: "Том", image: "🐘", example: "大房子。", exPinyin: "Dà fángzi.", exEnglish: "Big house." },
+                { char: "小", pinyin: "xiǎo", english: "small", mongolian: "Жижиг", image: "🐜", example: "小猫。", exPinyin: "Xiǎo māo.", exEnglish: "Small cat." },
+                { char: "中", pinyin: "zhōng", english: "middle", mongolian: "Дунд", image: "🎯", example: "中国。", exPinyin: "Zhōngguó.", exEnglish: "China." },
+                { char: "国", pinyin: "guó", english: "country", mongolian: "Улс", image: "🌍", example: "美国。", exPinyin: "Měiguó.", exEnglish: "America." },
+                { char: "家", pinyin: "jiā", english: "home", mongolian: "Гэр", image: "🏠", example: "我的家。", exPinyin: "Wǒ de jiā.", exEnglish: "My home." },
+                { char: "学", pinyin: "xué", english: "to learn", mongolian: "Сурах", image: "📚", example: "学中文。", exPinyin: "Xué Zhōngwén.", exEnglish: "Learn Chinese." },
+                { char: "生", pinyin: "shēng", english: "student", mongolian: "Оюутан", image: "🎓", example: "学生。", exPinyin: "Xuésheng.", exEnglish: "Student." },
+                { char: "老", pinyin: "lǎo", english: "old", mongolian: "Хөгшин", image: "👴", example: "老师。", exPinyin: "Lǎoshī.", exEnglish: "Teacher." },
+                { char: "师", pinyin: "shī", english: "teacher", mongolian: "Багш", image: "👨‍🏫", example: "老师好！", exPinyin: "Lǎoshī hǎo!", exEnglish: "Hello teacher!" },
+                { char: "书", pinyin: "shū", english: "book", mongolian: "Ном", image: "📖", example: "看书。", exPinyin: "Kàn shū.", exEnglish: "Read a book." },
+                { char: "写", pinyin: "xiě", english: "to write", mongolian: "Бичих", image: "✍️", example: "写字。", exPinyin: "Xiě zì.", exEnglish: "Write." },
+                { char: "字", pinyin: "zì", english: "character", mongolian: "Үсэг", image: "🔤", example: "汉字。", exPinyin: "Hànzì.", exEnglish: "Chinese character." },
+                { char: "说", pinyin: "shuō", english: "to speak", mongolian: "Ярих", image: "💬", example: "说中文。", exPinyin: "Shuō Zhōngwén.", exEnglish: "Speak Chinese." },
+                { char: "听", pinyin: "tīng", english: "to listen", mongolian: "Сонсох", image: "👂", example: "听音乐。", exPinyin: "Tīng yīnyuè.", exEnglish: "Listen to music." },
+                { char: "看", pinyin: "kàn", english: "to look", mongolian: "Харах", image: "👀", example: "看电影。", exPinyin: "Kàn diànyǐng.", exEnglish: "Watch a movie." },
+                { char: "读", pinyin: "dú", english: "to read", mongolian: "Унших", image: "📕", example: "读书。", exPinyin: "Dú shū.", exEnglish: "Read." },
+                { char: "吃", pinyin: "chī", english: "to eat", mongolian: "Идэх", image: "🍽️", example: "吃饭。", exPinyin: "Chī fàn.", exEnglish: "Eat." },
+                { char: "饭", pinyin: "fàn", english: "rice/meal", mongolian: "Хоол", image: "🍚", example: "米饭。", exPinyin: "Mǐfàn.", exEnglish: "Rice." },
+                { char: "喝", pinyin: "hē", english: "to drink", mongolian: "Уух", image: "🥤", example: "喝水。", exPinyin: "Hē shuǐ.", exEnglish: "Drink water." },
+                { char: "水", pinyin: "shuǐ", english: "water", mongolian: "Ус", image: "💧", example: "冷水。", exPinyin: "Lěng shuǐ.", exEnglish: "Cold water." },
+                { char: "茶", pinyin: "chá", english: "tea", mongolian: "Цай", image: "🍵", example: "喝茶。", exPinyin: "Hē chá.", exEnglish: "Drink tea." },
+                { char: "爱", pinyin: "ài", english: "love", mongolian: "Хайрлах", image: "❤️", example: "我爱你。", exPinyin: "Wǒ ài nǐ.", exEnglish: "I love you." },
+                { char: "喜欢", pinyin: "xǐhuan", english: "to like", mongolian: "Дуртай", image: "😊", example: "我喜欢你。", exPinyin: "Wǒ xǐhuan nǐ.", exEnglish: "I like you." },
+                { char: "工作", pinyin: "gōngzuò", english: "work", mongolian: "Ажил", image: "💼", example: "我工作。", exPinyin: "Wǒ gōngzuò.", exEnglish: "I work." },
+                { char: "钱", pinyin: "qián", english: "money", mongolian: "Мөнгө", image: "💰", example: "多少钱？", exPinyin: "Duōshao qián?", exEnglish: "How much?" },
+                { char: "买", pinyin: "mǎi", english: "to buy", mongolian: "Авах", image: "🛒", example: "买东西。", exPinyin: "Mǎi dōngxi.", exEnglish: "Buy things." },
+                { char: "东西", pinyin: "dōngxi", english: "thing", mongolian: "Юм", image: "📦", example: "什么东西？", exPinyin: "Shénme dōngxi?", exEnglish: "What thing?" },
+                { char: "今天", pinyin: "jīntiān", english: "today", mongolian: "Өнөөдөр", image: "📅", example: "今天很好。", exPinyin: "Jīntiān hěn hǎo.", exEnglish: "Today is good." },
+                { char: "明天", pinyin: "míngtiān", english: "tomorrow", mongolian: "Маргааш", image: "🌅", example: "明天见！", exPinyin: "Míngtiān jiàn!", exEnglish: "See you tomorrow!" },
+                { char: "谢谢", pinyin: "xièxie", english: "thank you", mongolian: "Баярлалаа", image: "🙏", example: "谢谢你！", exPinyin: "Xièxie nǐ!", exEnglish: "Thank you!" },
+                { char: "再见", pinyin: "zàijiàn", english: "goodbye", mongolian: "Баяртай", image: "👋", example: "再见！", exPinyin: "Zàijiàn!", exEnglish: "Goodbye!" },
+                { char: "朋友", pinyin: "péngyou", english: "friend", mongolian: "Найз", image: "🤝", example: "他是我的朋友。", exPinyin: "Tā shì wǒ de péngyou.", exEnglish: "He is my friend." },
+                { char: "医生", pinyin: "yīshēng", english: "doctor", mongolian: "Эмч", image: "👨‍⚕️", example: "她是医生。", exPinyin: "Tā shì yīshēng.", exEnglish: "She is a doctor." },
+                { char: "医院", pinyin: "yīyuàn", english: "hospital", mongolian: "Эмнэлэг", image: "🏥", example: "去医院。", exPinyin: "Qù yīyuàn.", exEnglish: "Go to hospital." },
+                { char: "电影", pinyin: "diànyǐng", english: "movie", mongolian: "Кино", image: "🎬", example: "看电影。", exPinyin: "Kàn diànyǐng.", exEnglish: "Watch a movie." },
+                { char: "电视", pinyin: "diànshì", english: "TV", mongolian: "ТВ", image: "📺", example: "看电视。", exPinyin: "Kàn diànshì.", exEnglish: "Watch TV." },
+                { char: "电脑", pinyin: "diànnǎo", english: "computer", mongolian: "Компьютер", image: "💻", example: "用电脑。", exPinyin: "Yòng diànnǎo.", exEnglish: "Use computer." },
+                { char: "电话", pinyin: "diànhuà", english: "phone", mongolian: "Утас", image: "📱", example: "打电话。", exPinyin: "Dǎ diànhuà.", exEnglish: "Make a call." },
+                { char: "高兴", pinyin: "gāoxìng", english: "happy", mongolian: "Баяртай", image: "😄", example: "我很高兴。", exPinyin: "Wǒ hěn gāoxìng.", exEnglish: "I am happy." },
+                { char: "漂亮", pinyin: "piàoliang", english: "beautiful", mongolian: "Гоё", image: "💐", example: "她很漂亮。", exPinyin: "Tā hěn piàoliang.", exEnglish: "She is beautiful." },
+                { char: "多少", pinyin: "duōshao", english: "how much", mongolian: "Хэд вэ", image: "❓", example: "多少钱？", exPinyin: "Duōshao qián?", exEnglish: "How much?" },
+                { char: "岁", pinyin: "suì", english: "years old", mongolian: "Нас", image: "🎂", example: "你几岁？", exPinyin: "Nǐ jǐ suì?", exEnglish: "How old are you?" },
+                { char: "几", pinyin: "jǐ", english: "how many", mongolian: "Хэд", image: "🔢", example: "几个？", exPinyin: "Jǐ gè?", exEnglish: "How many?" },
+                { char: "名字", pinyin: "míngzi", english: "name", mongolian: "Нэр", image: "📛", example: "你叫什么名字？", exPinyin: "Nǐ jiào shénme míngzi?", exEnglish: "What's your name?" },
+                { char: "叫", pinyin: "jiào", english: "to call", mongolian: "Нэрлэх", image: "📣", example: "我叫小明。", exPinyin: "Wǒ jiào Xiǎo Míng.", exEnglish: "My name is Xiao Ming." },
+                { char: "什么", pinyin: "shénme", english: "what", mongolian: "Юу", image: "❔", example: "什么？", exPinyin: "Shénme?", exEnglish: "What?" },
+                { char: "怎么", pinyin: "zěnme", english: "how", mongolian: "Яаж", image: "🤔", example: "怎么样？", exPinyin: "Zěnme yàng?", exEnglish: "How is it?" },
+                { char: "哪", pinyin: "nǎ", english: "which", mongolian: "Аль", image: "👆", example: "哪个？", exPinyin: "Nǎ gè?", exEnglish: "Which one?" },
+                { char: "哪儿", pinyin: "nǎr", english: "where", mongolian: "Хаана", image: "📍", example: "你去哪儿？", exPinyin: "Nǐ qù nǎr?", exEnglish: "Where are you going?" },
+                { char: "谁", pinyin: "shéi", english: "who", mongolian: "Хэн", image: "👤", example: "他是谁？", exPinyin: "Tā shì shéi?", exEnglish: "Who is he?" },
+                { char: "为什么", pinyin: "wèishénme", english: "why", mongolian: "Яагаад", image: "❓", example: "为什么？", exPinyin: "Wèishénme?", exEnglish: "Why?" },
+                { char: "很", pinyin: "hěn", english: "very", mongolian: "Маш", image: "💯", example: "很好！", exPinyin: "Hěn hǎo!", exEnglish: "Very good!" },
+                { char: "太", pinyin: "tài", english: "too", mongolian: "Хэтэрхий", image: "⬆️", example: "太好了！", exPinyin: "Tài hǎo le!", exEnglish: "Great!" },
+                { char: "都", pinyin: "dōu", english: "all", mongolian: "Бүгд", image: "👥", example: "我们都是学生。", exPinyin: "Wǒmen dōu shì xuésheng.", exEnglish: "We are all students." },
+                { char: "也", pinyin: "yě", english: "also", mongolian: "Бас", image: "➕", example: "我也是。", exPinyin: "Wǒ yě shì.", exEnglish: "Me too." },
+                { char: "没", pinyin: "méi", english: "not have", mongolian: "Байхгүй", image: "🚫", example: "没有。", exPinyin: "Méiyǒu.", exEnglish: "Don't have." },
+                { char: "有", pinyin: "yǒu", english: "to have", mongolian: "Байх", image: "✅", example: "我有书。", exPinyin: "Wǒ yǒu shū.", exEnglish: "I have a book." },
+                { char: "在", pinyin: "zài", english: "at/in", mongolian: "Байх", image: "📍", example: "我在家。", exPinyin: "Wǒ zài jiā.", exEnglish: "I am at home." },
+                { char: "去", pinyin: "qù", english: "to go", mongolian: "Явах", image: "🚶", example: "去学校。", exPinyin: "Qù xuéxiào.", exEnglish: "Go to school." },
+                { char: "来", pinyin: "lái", english: "to come", mongolian: "Ирэх", image: "🏃", example: "来这儿！", exPinyin: "Lái zhèr!", exEnglish: "Come here!" },
+                { char: "回", pinyin: "huí", english: "to return", mongolian: "Буцах", image: "↩️", example: "回家。", exPinyin: "Huí jiā.", exEnglish: "Go home." },
+                { char: "想", pinyin: "xiǎng", english: "to want", mongolian: "Хүсэх", image: "💭", example: "我想去。", exPinyin: "Wǒ xiǎng qù.", exEnglish: "I want to go." },
+                { char: "能", pinyin: "néng", english: "can", mongolian: "Чадах", image: "💪", example: "我能做。", exPinyin: "Wǒ néng zuò.", exEnglish: "I can do it." },
+                { char: "会", pinyin: "huì", english: "can/will", mongolian: "Чадах", image: "✨", example: "我会说中文。", exPinyin: "Wǒ huì shuō Zhōngwén.", exEnglish: "I can speak Chinese." },
+                { char: "做", pinyin: "zuò", english: "to do", mongolian: "Хийх", image: "🔨", example: "做什么？", exPinyin: "Zuò shénme?", exEnglish: "Do what?" },
+                { char: "住", pinyin: "zhù", english: "to live", mongolian: "Амьдрах", image: "🏠", example: "你住哪儿？", exPinyin: "Nǐ zhù nǎr?", exEnglish: "Where do you live?" },
+                { char: "坐", pinyin: "zuò", english: "to sit", mongolian: "Суух", image: "🪑", example: "请坐！", exPinyin: "Qǐng zuò!", exEnglish: "Please sit!" },
+                { char: "睡觉", pinyin: "shuìjiào", english: "to sleep", mongolian: "Унтах", image: "😴", example: "我要睡觉。", exPinyin: "Wǒ yào shuìjiào.", exEnglish: "I want to sleep." },
+                { char: "起床", pinyin: "qǐchuáng", english: "get up", mongolian: "Босох", image: "🌅", example: "早上起床。", exPinyin: "Zǎoshang qǐchuáng.", exEnglish: "Wake up in morning." },
+                { char: "上", pinyin: "shàng", english: "up/on", mongolian: "Дээр", image: "⬆️", example: "上班。", exPinyin: "Shàngbān.", exEnglish: "Go to work." },
+                { char: "下", pinyin: "xià", english: "down", mongolian: "Доор", image: "⬇️", example: "下班。", exPinyin: "Xiàbān.", exEnglish: "Get off work." },
+                { char: "前", pinyin: "qián", english: "front", mongolian: "Урд", image: "⏩", example: "前面。", exPinyin: "Qiánmiàn.", exEnglish: "In front." },
+                { char: "后", pinyin: "hòu", english: "behind", mongolian: "Хойно", image: "⏪", example: "后面。", exPinyin: "Hòumiàn.", exEnglish: "Behind." },
+                { char: "里", pinyin: "lǐ", english: "inside", mongolian: "Дотор", image: "📦", example: "里面。", exPinyin: "Lǐmiàn.", exEnglish: "Inside." },
+                { char: "外", pinyin: "wài", english: "outside", mongolian: "Гадна", image: "🌳", example: "外面。", exPinyin: "Wàimiàn.", exEnglish: "Outside." },
+                { char: "这", pinyin: "zhè", english: "this", mongolian: "Энэ", image: "👇", example: "这是什么？", exPinyin: "Zhè shì shénme?", exEnglish: "What is this?" },
+                { char: "那", pinyin: "nà", english: "that", mongolian: "Тэр", image: "👉", example: "那是书。", exPinyin: "Nà shì shū.", exEnglish: "That is a book." },
+                { char: "的", pinyin: "de", english: "possessive", mongolian: "-ын", image: "🔗", example: "我的书。", exPinyin: "Wǒ de shū.", exEnglish: "My book." },
+                { char: "和", pinyin: "hé", english: "and", mongolian: "Ба", image: "➕", example: "你和我。", exPinyin: "Nǐ hé wǒ.", exEnglish: "You and me." },
+                { char: "对", pinyin: "duì", english: "correct", mongolian: "Зөв", image: "✔️", example: "对！", exPinyin: "Duì!", exEnglish: "Correct!" },
+                { char: "请", pinyin: "qǐng", english: "please", mongolian: "Гуйя", image: "🙏", example: "请进！", exPinyin: "Qǐng jìn!", exEnglish: "Please come in!" },
+                { char: "问", pinyin: "wèn", english: "to ask", mongolian: "Асуух", image: "❓", example: "我问你。", exPinyin: "Wǒ wèn nǐ.", exEnglish: "I ask you." },
+                { char: "给", pinyin: "gěi", english: "to give", mongolian: "Өгөх", image: "🎁", example: "给你！", exPinyin: "Gěi nǐ!", exEnglish: "For you!" },
+                { char: "开", pinyin: "kāi", english: "to open", mongolian: "Нээх", image: "🚪", example: "开门。", exPinyin: "Kāi mén.", exEnglish: "Open door." },
+                { char: "关", pinyin: "guān", english: "to close", mongolian: "Хаах", image: "🔒", example: "关门。", exPinyin: "Guān mén.", exEnglish: "Close door." },
+                { char: "年", pinyin: "nián", english: "year", mongolian: "Жил", image: "📅", example: "今年。", exPinyin: "Jīnnián.", exEnglish: "This year." },
+                { char: "月", pinyin: "yuè", english: "month", mongolian: "Сар", image: "🌙", example: "一月。", exPinyin: "Yī yuè.", exEnglish: "January." },
+                { char: "日", pinyin: "rì", english: "day", mongolian: "Өдөр", image: "☀️", example: "星期日。", exPinyin: "Xīngqī rì.", exEnglish: "Sunday." },
+                { char: "星期", pinyin: "xīngqī", english: "week", mongolian: "Долоо хоног", image: "📆", example: "星期一。", exPinyin: "Xīngqī yī.", exEnglish: "Monday." },
+                { char: "点", pinyin: "diǎn", english: "o'clock", mongolian: "Цаг", image: "🕐", example: "几点？", exPinyin: "Jǐ diǎn?", exEnglish: "What time?" },
+                { char: "分", pinyin: "fēn", english: "minute", mongolian: "Минут", image: "⏱️", example: "十分钟。", exPinyin: "Shí fēnzhōng.", exEnglish: "10 minutes." },
+                { char: "昨天", pinyin: "zuótiān", english: "yesterday", mongolian: "Өчигдөр", image: "⏮️", example: "昨天很忙。", exPinyin: "Zuótiān hěn máng.", exEnglish: "Yesterday was busy." },
+                { char: "早上", pinyin: "zǎoshang", english: "morning", mongolian: "Өглөө", image: "🌄", example: "早上好！", exPinyin: "Zǎoshang hǎo!", exEnglish: "Good morning!" },
+                { char: "中午", pinyin: "zhōngwǔ", english: "noon", mongolian: "Үд", image: "🌞", example: "中午吃饭。", exPinyin: "Zhōngwǔ chī fàn.", exEnglish: "Eat at noon." },
+                { char: "下午", pinyin: "xiàwǔ", english: "afternoon", mongolian: "Үдээс хойш", image: "🌤️", example: "下午好！", exPinyin: "Xiàwǔ hǎo!", exEnglish: "Good afternoon!" },
+                { char: "晚上", pinyin: "wǎnshang", english: "evening", mongolian: "Орой", image: "🌙", example: "晚上好！", exPinyin: "Wǎnshang hǎo!", exEnglish: "Good evening!" },
+                { char: "现在", pinyin: "xiànzài", english: "now", mongolian: "Одоо", image: "⏰", example: "现在几点？", exPinyin: "Xiànzài jǐ diǎn?", exEnglish: "What time now?" },
+                { char: "时候", pinyin: "shíhou", english: "time/when", mongolian: "Үед", image: "⏳", example: "什么时候？", exPinyin: "Shénme shíhou?", exEnglish: "When?" },
+                { char: "苹果", pinyin: "píngguǒ", english: "apple", mongolian: "Алим", image: "🍎", example: "一个苹果。", exPinyin: "Yī gè píngguǒ.", exEnglish: "One apple." },
+                { char: "米饭", pinyin: "mǐfàn", english: "rice", mongolian: "Будаа", image: "🍚", example: "吃米饭。", exPinyin: "Chī mǐfàn.", exEnglish: "Eat rice." },
+                { char: "菜", pinyin: "cài", english: "vegetable", mongolian: "Ногоо", image: "🥬", example: "买菜。", exPinyin: "Mǎi cài.", exEnglish: "Buy vegetables." },
+                { char: "水果", pinyin: "shuǐguǒ", english: "fruit", mongolian: "Жимс", image: "🍇", example: "吃水果。", exPinyin: "Chī shuǐguǒ.", exEnglish: "Eat fruit." },
+                { char: "猫", pinyin: "māo", english: "cat", mongolian: "Муур", image: "🐱", example: "小猫。", exPinyin: "Xiǎo māo.", exEnglish: "Little cat." },
+                { char: "狗", pinyin: "gǒu", english: "dog", mongolian: "Нохой", image: "🐕", example: "大狗。", exPinyin: "Dà gǒu.", exEnglish: "Big dog." },
+                { char: "天气", pinyin: "tiānqì", english: "weather", mongolian: "Цаг агаар", image: "🌤️", example: "天气很好。", exPinyin: "Tiānqì hěn hǎo.", exEnglish: "Weather is good." },
+                { char: "下雨", pinyin: "xiàyǔ", english: "rain", mongolian: "Бороо орох", image: "🌧️", example: "下雨了。", exPinyin: "Xià yǔ le.", exEnglish: "It's raining." },
+                { char: "冷", pinyin: "lěng", english: "cold", mongolian: "Хүйтэн", image: "❄️", example: "今天很冷。", exPinyin: "Jīntiān hěn lěng.", exEnglish: "It's cold today." },
+                { char: "热", pinyin: "rè", english: "hot", mongolian: "Халуун", image: "🔥", example: "天气很热。", exPinyin: "Tiānqì hěn rè.", exEnglish: "Weather is hot." },
+                { char: "衣服", pinyin: "yīfu", english: "clothes", mongolian: "Хувцас", image: "👕", example: "买衣服。", exPinyin: "Mǎi yīfu.", exEnglish: "Buy clothes." },
+                { char: "车", pinyin: "chē", english: "car", mongolian: "Машин", image: "🚗", example: "开车。", exPinyin: "Kāi chē.", exEnglish: "Drive a car." },
+                { char: "出租车", pinyin: "chūzūchē", english: "taxi", mongolian: "Такси", image: "🚕", example: "打出租车。", exPinyin: "Dǎ chūzūchē.", exEnglish: "Take a taxi." },
+                { char: "飞机", pinyin: "fēijī", english: "airplane", mongolian: "Онгоц", image: "✈️", example: "坐飞机。", exPinyin: "Zuò fēijī.", exEnglish: "Take a plane." },
+                { char: "火车站", pinyin: "huǒchēzhàn", english: "train station", mongolian: "Галт тэрэгний буудал", image: "🚉", example: "去火车站。", exPinyin: "Qù huǒchēzhàn.", exEnglish: "Go to train station." },
+                { char: "学校", pinyin: "xuéxiào", english: "school", mongolian: "Сургууль", image: "🏫", example: "去学校。", exPinyin: "Qù xuéxiào.", exEnglish: "Go to school." },
+                { char: "饭馆", pinyin: "fànguǎn", english: "restaurant", mongolian: "Зоогийн газар", image: "🍽️", example: "去饭馆。", exPinyin: "Qù fànguǎn.", exEnglish: "Go to restaurant." },
+                { char: "商店", pinyin: "shāngdiàn", english: "shop", mongolian: "Дэлгүүр", image: "🏪", example: "去商店。", exPinyin: "Qù shāngdiàn.", exEnglish: "Go to shop." },
+                { char: "中国", pinyin: "Zhōngguó", english: "China", mongolian: "Хятад", image: "🇨🇳", example: "去中国。", exPinyin: "Qù Zhōngguó.", exEnglish: "Go to China." },
+                { char: "北京", pinyin: "Běijīng", english: "Beijing", mongolian: "Бээжин", image: "🏛️", example: "我在北京。", exPinyin: "Wǒ zài Běijīng.", exEnglish: "I am in Beijing." },
+                { char: "中文", pinyin: "Zhōngwén", english: "Chinese", mongolian: "Хятад хэл", image: "🈶", example: "学中文。", exPinyin: "Xué Zhōngwén.", exEnglish: "Learn Chinese." },
+                { char: "汉语", pinyin: "Hànyǔ", english: "Chinese language", mongolian: "Хятад хэл", image: "🗣️", example: "说汉语。", exPinyin: "Shuō Hànyǔ.", exEnglish: "Speak Chinese." },
+                { char: "块", pinyin: "kuài", english: "yuan", mongolian: "Юань", image: "💴", example: "十块钱。", exPinyin: "Shí kuài qián.", exEnglish: "Ten yuan." },
+                { char: "个", pinyin: "gè", english: "measure word", mongolian: "Тоологч", image: "🔢", example: "一个人。", exPinyin: "Yī gè rén.", exEnglish: "One person." },
+                { char: "本", pinyin: "běn", english: "measure (books)", mongolian: "Тоологч (ном)", image: "📚", example: "一本书。", exPinyin: "Yī běn shū.", exEnglish: "One book." },
+                { char: "杯", pinyin: "bēi", english: "cup", mongolian: "Аяга", image: "☕", example: "一杯茶。", exPinyin: "Yī bēi chá.", exEnglish: "A cup of tea." },
+                { char: "些", pinyin: "xiē", english: "some", mongolian: "Зарим", image: "📦", example: "一些人。", exPinyin: "Yīxiē rén.", exEnglish: "Some people." },
+                { char: "儿子", pinyin: "érzi", english: "son", mongolian: "Хүү", image: "👦", example: "我的儿子。", exPinyin: "Wǒ de érzi.", exEnglish: "My son." },
+                { char: "女儿", pinyin: "nǚ'ér", english: "daughter", mongolian: "Охин", image: "👧", example: "我的女儿。", exPinyin: "Wǒ de nǚ'ér.", exEnglish: "My daughter." },
+                { char: "爸爸", pinyin: "bàba", english: "father", mongolian: "Аав", image: "👨", example: "我爸爸。", exPinyin: "Wǒ bàba.", exEnglish: "My father." },
+                { char: "妈妈", pinyin: "māma", english: "mother", mongolian: "Ээж", image: "👩", example: "我妈妈。", exPinyin: "Wǒ māma.", exEnglish: "My mother." },
+                { char: "先生", pinyin: "xiānsheng", english: "Mr.", mongolian: "Ноён", image: "👔", example: "王先生。", exPinyin: "Wáng xiānsheng.", exEnglish: "Mr. Wang." },
+                { char: "小姐", pinyin: "xiǎojiě", english: "Miss", mongolian: "Хатагтай", image: "👗", example: "李小姐。", exPinyin: "Lǐ xiǎojiě.", exEnglish: "Miss Li." },
+                { char: "同学", pinyin: "tóngxué", english: "classmate", mongolian: "Хамт сурагч", image: "👫", example: "我的同学。", exPinyin: "Wǒ de tóngxué.", exEnglish: "My classmate." }
+            ],
+            2: [
+                { char: "因为", pinyin: "yīnwèi", english: "because", mongolian: "Учир нь", image: "🤔", example: "因为我喜欢。", exPinyin: "Yīnwèi wǒ xǐhuān.", exEnglish: "Because I like it." },
+                { char: "所以", pinyin: "suǒyǐ", english: "so/therefore", mongolian: "Тэгээд", image: "➡️", example: "所以我来了。", exPinyin: "Suǒyǐ wǒ lái le.", exEnglish: "So I came." },
+                { char: "但是", pinyin: "dànshì", english: "but", mongolian: "Гэхдээ", image: "↩️", example: "但是很贵。", exPinyin: "Dànshì hěn guì.", exEnglish: "But it's expensive." },
+                { char: "已经", pinyin: "yǐjīng", english: "already", mongolian: "Аль хэдийн", image: "✅", example: "已经到了。", exPinyin: "Yǐjīng dào le.", exEnglish: "Already arrived." },
+                { char: "虽然", pinyin: "suīrán", english: "although", mongolian: "Хэдийгээр", image: "🔄", example: "虽然很难。", exPinyin: "Suīrán hěn nán.", exEnglish: "Although it's hard." },
+                { char: "可能", pinyin: "kěnéng", english: "maybe/possible", mongolian: "Магадгүй", image: "❓", example: "可能下雨。", exPinyin: "Kěnéng xià yǔ.", exEnglish: "Maybe it will rain." },
+                { char: "应该", pinyin: "yīnggāi", english: "should", mongolian: "Ёстой", image: "👆", example: "你应该去。", exPinyin: "Nǐ yīnggāi qù.", exEnglish: "You should go." },
+                { char: "需要", pinyin: "xūyào", english: "need", mongolian: "Хэрэгтэй", image: "🎯", example: "我需要帮助。", exPinyin: "Wǒ xūyào bāngzhù.", exEnglish: "I need help." },
+                { char: "准备", pinyin: "zhǔnbèi", english: "prepare", mongolian: "Бэлтгэх", image: "📋", example: "准备好了吗？", exPinyin: "Zhǔnbèi hǎo le ma?", exEnglish: "Are you ready?" },
+                { char: "关系", pinyin: "guānxi", english: "relationship", mongolian: "Харилцаа", image: "🤝", example: "没关系。", exPinyin: "Méi guānxi.", exEnglish: "No problem." },
+                { char: "希望", pinyin: "xīwàng", english: "hope", mongolian: "Найдах", image: "🌟", example: "我希望你开心。", exPinyin: "Wǒ xīwàng nǐ kāixīn.", exEnglish: "I hope you're happy." },
+                { char: "决定", pinyin: "juédìng", english: "decide", mongolian: "Шийдэх", image: "⚖️", example: "我决定了。", exPinyin: "Wǒ juédìng le.", exEnglish: "I've decided." },
+                { char: "简单", pinyin: "jiǎndān", english: "simple", mongolian: "Энгийн", image: "🔘", example: "很简单。", exPinyin: "Hěn jiǎndān.", exEnglish: "Very simple." },
+                { char: "复杂", pinyin: "fùzá", english: "complicated", mongolian: "Төвөгтэй", image: "🔀", example: "太复杂了。", exPinyin: "Tài fùzá le.", exEnglish: "Too complicated." },
+                { char: "重要", pinyin: "zhòngyào", english: "important", mongolian: "Чухал", image: "⭐", example: "这很重要。", exPinyin: "Zhè hěn zhòngyào.", exEnglish: "This is important." }
+            ],
+            3: [
+                { char: "其实", pinyin: "qíshí", english: "actually", mongolian: "Үнэндээ", image: "💡", example: "其实我知道。", exPinyin: "Qíshí wǒ zhīdào.", exEnglish: "Actually I know." },
+                { char: "关于", pinyin: "guānyú", english: "about/regarding", mongolian: "Тухай", image: "📖", example: "关于这件事。", exPinyin: "Guānyú zhè jiàn shì.", exEnglish: "About this matter." },
+                { char: "根据", pinyin: "gēnjù", english: "according to", mongolian: "Дагуу", image: "📊", example: "根据报告。", exPinyin: "Gēnjù bàogào.", exEnglish: "According to the report." },
+                { char: "无论", pinyin: "wúlùn", english: "no matter", mongolian: "Ямар ч", image: "🔄", example: "无论如何。", exPinyin: "Wúlùn rúhé.", exEnglish: "No matter what." },
+                { char: "经验", pinyin: "jīngyàn", english: "experience", mongolian: "Туршлага", image: "📈", example: "没有经验。", exPinyin: "Méiyǒu jīngyàn.", exEnglish: "No experience." },
+                { char: "原因", pinyin: "yuányīn", english: "reason/cause", mongolian: "Шалтгаан", image: "❔", example: "什么原因？", exPinyin: "Shénme yuányīn?", exEnglish: "What's the reason?" },
+                { char: "结果", pinyin: "jiéguǒ", english: "result", mongolian: "Үр дүн", image: "📋", example: "结果很好。", exPinyin: "Jiéguǒ hěn hǎo.", exEnglish: "The result is good." },
+                { char: "条件", pinyin: "tiáojiàn", english: "condition", mongolian: "Нөхцөл", image: "📝", example: "条件不错。", exPinyin: "Tiáojiàn bùcuò.", exEnglish: "Good conditions." },
+                { char: "方法", pinyin: "fāngfǎ", english: "method", mongolian: "Арга", image: "🔧", example: "好方法！", exPinyin: "Hǎo fāngfǎ!", exEnglish: "Good method!" },
+                { char: "情况", pinyin: "qíngkuàng", english: "situation", mongolian: "Байдал", image: "📌", example: "什么情况？", exPinyin: "Shénme qíngkuàng?", exEnglish: "What's the situation?" },
+                { char: "影响", pinyin: "yǐngxiǎng", english: "influence", mongolian: "Нөлөө", image: "🌊", example: "没有影响。", exPinyin: "Méiyǒu yǐngxiǎng.", exEnglish: "No influence." },
+                { char: "发展", pinyin: "fāzhǎn", english: "develop", mongolian: "Хөгжүүлэх", image: "📈", example: "发展很快。", exPinyin: "Fāzhǎn hěn kuài.", exEnglish: "Developing quickly." },
+                { char: "标准", pinyin: "biāozhǔn", english: "standard", mongolian: "Стандарт", image: "📏", example: "标准很高。", exPinyin: "Biāozhǔn hěn gāo.", exEnglish: "High standard." },
+                { char: "提供", pinyin: "tígōng", english: "provide", mongolian: "Хангах", image: "🎁", example: "提供服务。", exPinyin: "Tígōng fúwù.", exEnglish: "Provide service." },
+                { char: "支持", pinyin: "zhīchí", english: "support", mongolian: "Дэмжих", image: "🤲", example: "我支持你。", exPinyin: "Wǒ zhīchí nǐ.", exEnglish: "I support you." }
+            ],
+            4: [
+                { char: "尽管", pinyin: "jǐnguǎn", english: "despite/although", mongolian: "Хэдийгээр", image: "🔄", example: "尽管很难。", exPinyin: "Jǐnguǎn hěn nán.", exEnglish: "Despite the difficulty." },
+                { char: "竟然", pinyin: "jìngrán", english: "unexpectedly", mongolian: "Гэнэт", image: "😮", example: "竟然成功了！", exPinyin: "Jìngrán chénggōng le!", exEnglish: "Unexpectedly succeeded!" },
+                { char: "究竟", pinyin: "jiūjìng", english: "after all/exactly", mongolian: "Яг", image: "🔍", example: "究竟怎么了？", exPinyin: "Jiūjìng zěnme le?", exEnglish: "What exactly happened?" },
+                { char: "否则", pinyin: "fǒuzé", english: "otherwise", mongolian: "Эсвэл", image: "⚠️", example: "快点，否则迟到。", exPinyin: "Kuài diǎn, fǒuzé chídào.", exEnglish: "Hurry, otherwise late." },
+                { char: "甚至", pinyin: "shènzhì", english: "even", mongolian: "Бүр", image: "➕", example: "甚至更好。", exPinyin: "Shènzhì gèng hǎo.", exEnglish: "Even better." },
+                { char: "逐渐", pinyin: "zhújiàn", english: "gradually", mongolian: "Аажмаар", image: "📶", example: "逐渐习惯了。", exPinyin: "Zhújiàn xíguàn le.", exEnglish: "Gradually got used to it." },
+                { char: "显然", pinyin: "xiǎnrán", english: "obviously", mongolian: "Мэдээж", image: "👁️", example: "显然是错的。", exPinyin: "Xiǎnrán shì cuò de.", exEnglish: "Obviously wrong." },
+                { char: "实际", pinyin: "shíjì", english: "actual/practical", mongolian: "Бодит", image: "📊", example: "实际情况。", exPinyin: "Shíjì qíngkuàng.", exEnglish: "Actual situation." },
+                { char: "具体", pinyin: "jùtǐ", english: "specific/concrete", mongolian: "Тодорхой", image: "🎯", example: "具体计划。", exPinyin: "Jùtǐ jìhuà.", exEnglish: "Specific plan." },
+                { char: "效果", pinyin: "xiàoguǒ", english: "effect/result", mongolian: "Үр нөлөө", image: "✨", example: "效果很好。", exPinyin: "Xiàoguǒ hěn hǎo.", exEnglish: "Good effect." },
+                { char: "态度", pinyin: "tàidù", english: "attitude", mongolian: "Хандлага", image: "🙂", example: "态度很好。", exPinyin: "Tàidù hěn hǎo.", exEnglish: "Good attitude." },
+                { char: "观点", pinyin: "guāndiǎn", english: "viewpoint", mongolian: "Үзэл бодол", image: "💭", example: "我的观点。", exPinyin: "Wǒ de guāndiǎn.", exEnglish: "My viewpoint." },
+                { char: "证明", pinyin: "zhèngmíng", english: "prove", mongolian: "Нотлох", image: "✅", example: "证明你是对的。", exPinyin: "Zhèngmíng nǐ shì duì de.", exEnglish: "Proves you're right." },
+                { char: "解释", pinyin: "jiěshì", english: "explain", mongolian: "Тайлбарлах", image: "💬", example: "请解释一下。", exPinyin: "Qǐng jiěshì yīxià.", exEnglish: "Please explain." },
+                { char: "承认", pinyin: "chéngrèn", english: "admit", mongolian: "Хүлээн зөвшөөрөх", image: "🤚", example: "我承认错误。", exPinyin: "Wǒ chéngrèn cuòwù.", exEnglish: "I admit my mistake." }
+            ]
+        };
+
+        // 100 Slang Words Bank
+        const slangWords = [
+            { char: "牛逼", pinyin: "niú bī", meaning: "Awesome (vulgar)", mongolian: "Гайхалтай" },
+            { char: "真的假的", pinyin: "zhēn de jiǎ de", meaning: "Really? No way!", mongolian: "Үнэхээр үү?" },
+            { char: "没问题", pinyin: "méi wèntí", meaning: "No problem", mongolian: "Асуудалгүй" },
+            { char: "随便", pinyin: "suíbiàn", meaning: "Whatever", mongolian: "Хамаагүй" },
+            { char: "靠谱", pinyin: "kào pǔ", meaning: "Reliable", mongolian: "Найдвартай" },
+            { char: "给力", pinyin: "gěi lì", meaning: "Awesome/Cool", mongolian: "Гайхалтай" },
+            { char: "算了", pinyin: "suàn le", meaning: "Forget it", mongolian: "Болоо" },
+            { char: "厉害", pinyin: "lì hai", meaning: "Amazing", mongolian: "Гайхамшигтай" },
+            { char: "搞定", pinyin: "gǎo dìng", meaning: "Done/Handled", mongolian: "Дууссан" },
+            { char: "行", pinyin: "xíng", meaning: "OK/Fine", mongolian: "За" },
+            { char: "加油", pinyin: "jiā yóu", meaning: "Come on!/Go!", mongolian: "Хичээгээрэй" },
+            { char: "无聊", pinyin: "wú liáo", meaning: "Boring", mongolian: "Уйтгартай" },
+            { char: "累死了", pinyin: "lèi sǐ le", meaning: "Exhausted", mongolian: "Маш ядарсан" },
+            { char: "爽", pinyin: "shuǎng", meaning: "Feels great", mongolian: "Таатай" },
+            { char: "帅哥", pinyin: "shuài gē", meaning: "Handsome guy", mongolian: "Сайхан залуу" },
+            { char: "美女", pinyin: "měi nǚ", meaning: "Beautiful girl", mongolian: "Сайхан охин" },
+            { char: "哥们", pinyin: "gē men", meaning: "Bro/Buddy", mongolian: "Дүү/Ах" },
+            { char: "闺蜜", pinyin: "guī mì", meaning: "Bestie (female)", mongolian: "Хамгийн дотны найз" },
+            { char: "宅男", pinyin: "zhái nán", meaning: "Homebody guy", mongolian: "Гэрийн залуу" },
+            { char: "土豪", pinyin: "tǔ háo", meaning: "Rich person", mongolian: "Баян хүн" },
+            { char: "屌丝", pinyin: "diǎo sī", meaning: "Loser", mongolian: "Ялагдагч" },
+            { char: "高富帅", pinyin: "gāo fù shuài", meaning: "Tall rich handsome", mongolian: "Өндөр баян сайхан" },
+            { char: "白富美", pinyin: "bái fù měi", meaning: "Fair rich beautiful", mongolian: "Цагаан баян сайхан" },
+            { char: "吃货", pinyin: "chī huò", meaning: "Foodie", mongolian: "Идэх дуртай хүн" },
+            { char: "剁手", pinyin: "duò shǒu", meaning: "Shopaholic", mongolian: "Дэлгүүр дуртай" },
+            { char: "网红", pinyin: "wǎng hóng", meaning: "Internet celebrity", mongolian: "Интернет од" },
+            { char: "点赞", pinyin: "diǎn zàn", meaning: "Like (social)", mongolian: "Лайк" },
+            { char: "刷屏", pinyin: "shuā píng", meaning: "Go viral", mongolian: "Вирал болох" },
+            { char: "抖音", pinyin: "dǒu yīn", meaning: "TikTok", mongolian: "ТикТок" },
+            { char: "小红书", pinyin: "xiǎo hóng shū", meaning: "Little Red Book app", mongolian: "Жижиг улаан ном" },
+            { char: "奶茶", pinyin: "nǎi chá", meaning: "Bubble tea", mongolian: "Сүүн цай" },
+            { char: "火锅", pinyin: "huǒ guō", meaning: "Hot pot", mongolian: "Халуун тогоо" },
+            { char: "撸串", pinyin: "lū chuàn", meaning: "Eat skewers", mongolian: "Шорлог идэх" },
+            { char: "开黑", pinyin: "kāi hēi", meaning: "Play games together", mongolian: "Хамт тоглох" },
+            { char: "氪金", pinyin: "kè jīn", meaning: "Pay to win", mongolian: "Мөнгө төлөх" },
+            { char: "躺平", pinyin: "tǎng píng", meaning: "Lie flat/Give up", mongolian: "Хэвтэх" },
+            { char: "内卷", pinyin: "nèi juǎn", meaning: "Rat race", mongolian: "Өрсөлдөөн" },
+            { char: "社死", pinyin: "shè sǐ", meaning: "Social death", mongolian: "Нийгмийн үхэл" },
+            { char: "emo", pinyin: "emo", meaning: "Emotional/Sad", mongolian: "Гунигтай" },
+            { char: "佛系", pinyin: "fó xì", meaning: "Zen/Chill attitude", mongolian: "Тайван" },
+            { char: "真香", pinyin: "zhēn xiāng", meaning: "Delicious/Changed mind", mongolian: "Амттай" },
+            { char: "凡尔赛", pinyin: "fán ěr sài", meaning: "Humble brag", mongolian: "Далд сайрхах" },
+            { char: "绝绝子", pinyin: "jué jué zi", meaning: "Amazing!", mongolian: "Гайхалтай!" },
+            { char: "YYDS", pinyin: "yǒng yuǎn de shén", meaning: "GOAT/The best", mongolian: "Хамгийн шилдэг" },
+            { char: "破防", pinyin: "pò fáng", meaning: "Touched/Emotional", mongolian: "Сэтгэл хөдөлсөн" },
+            { char: "上头", pinyin: "shàng tóu", meaning: "Addicted/Obsessed", mongolian: "Донтсон" },
+            { char: "下头", pinyin: "xià tóu", meaning: "Turn off/Disappointed", mongolian: "Сонирхол алдсан" },
+            { char: "芭比Q", pinyin: "bā bǐ Q", meaning: "BBQ/Finished", mongolian: "Дууссан" },
+            { char: "蚌埠住了", pinyin: "bàng bù zhù le", meaning: "Can't hold it (laugh)", mongolian: "Тэвчээргүй" },
+            { char: "救命", pinyin: "jiù mìng", meaning: "Help!/OMG", mongolian: "Тусламж!" },
+            { char: "笑死", pinyin: "xiào sǐ", meaning: "LOL/Dying laughing", mongolian: "Инээд алж байна" },
+            { char: "哭了", pinyin: "kū le", meaning: "Crying (touched)", mongolian: "Уйлж байна" },
+            { char: "吐了", pinyin: "tù le", meaning: "Disgusted", mongolian: "Бөөлжиж байна" },
+            { char: "醉了", pinyin: "zuì le", meaning: "Speechless", mongolian: "Үг алдсан" },
+            { char: "绝了", pinyin: "jué le", meaning: "Incredible", mongolian: "Гайхалтай" },
+            { char: "我晕", pinyin: "wǒ yūn", meaning: "OMG/Dizzy", mongolian: "Эргэж байна" },
+            { char: "我去", pinyin: "wǒ qù", meaning: "WTF/Wow", mongolian: "Вау" },
+            { char: "卧槽", pinyin: "wò cào", meaning: "WTF (vulgar)", mongolian: "Юу вэ" },
+            { char: "我靠", pinyin: "wǒ kào", meaning: "Damn/Wow", mongolian: "Өө" },
+            { char: "尴尬", pinyin: "gān gà", meaning: "Awkward", mongolian: "Эвгүй" },
+            { char: "丢脸", pinyin: "diū liǎn", meaning: "Embarrassing", mongolian: "Ичих" },
+            { char: "装逼", pinyin: "zhuāng bī", meaning: "Show off", mongolian: "Сайрхах" },
+            { char: "杠精", pinyin: "gàng jīng", meaning: "Troll/Arguer", mongolian: "Маргаач" },
+            { char: "键盘侠", pinyin: "jiàn pán xiá", meaning: "Keyboard warrior", mongolian: "Гарын баатар" },
+            { char: "柠檬精", pinyin: "níng méng jīng", meaning: "Jealous person", mongolian: "Атаархаач" },
+            { char: "白嫖", pinyin: "bái piáo", meaning: "Get free stuff", mongolian: "Үнэгүй авах" },
+            { char: "种草", pinyin: "zhǒng cǎo", meaning: "Recommend/Want to buy", mongolian: "Зөвлөх" },
+            { char: "拔草", pinyin: "bá cǎo", meaning: "Finally buy it", mongolian: "Эцэст нь авах" },
+            { char: "安利", pinyin: "ān lì", meaning: "Recommend strongly", mongolian: "Санал болгох" },
+            { char: "打卡", pinyin: "dǎ kǎ", meaning: "Check in/Visit", mongolian: "Бүртгүүлэх" },
+            { char: "摸鱼", pinyin: "mō yú", meaning: "Slack off at work", mongolian: "Залхуурах" },
+            { char: "划水", pinyin: "huá shuǐ", meaning: "Slack off", mongolian: "Залхуурах" },
+            { char: "社恐", pinyin: "shè kǒng", meaning: "Social anxiety", mongolian: "Нийгмийн айдас" },
+            { char: "社牛", pinyin: "shè niú", meaning: "Social butterfly", mongolian: "Нийтэч хүн" },
+            { char: "老铁", pinyin: "lǎo tiě", meaning: "Close friend", mongolian: "Дотны найз" },
+            { char: "兄弟", pinyin: "xiōng dì", meaning: "Bro", mongolian: "Ах дүү" },
+            { char: "小姐姐", pinyin: "xiǎo jiě jiě", meaning: "Young lady", mongolian: "Охин" },
+            { char: "小哥哥", pinyin: "xiǎo gē ge", meaning: "Young man", mongolian: "Залуу" },
+            { char: "老板", pinyin: "lǎo bǎn", meaning: "Boss/Sir", mongolian: "Дарга" },
+            { char: "兄dei", pinyin: "xiōng dei", meaning: "Bro (slang)", mongolian: "Ах дүү" },
+            { char: "酸了", pinyin: "suān le", meaning: "Jealous", mongolian: "Атаархсан" },
+            { char: "甜", pinyin: "tián", meaning: "Sweet/Cute", mongolian: "Хөөрхөн" },
+            { char: "磕CP", pinyin: "kē CP", meaning: "Ship a couple", mongolian: "Хосыг дэмжих" },
+            { char: "嗑瓜子", pinyin: "kē guā zǐ", meaning: "Eat melon seeds/Watch drama", mongolian: "Драм үзэх" },
+            { char: "吃瓜", pinyin: "chī guā", meaning: "Watch the drama", mongolian: "Драм үзэх" },
+            { char: "瓜", pinyin: "guā", meaning: "Gossip/Drama", mongolian: "Цуурхал" },
+            { char: "反转", pinyin: "fǎn zhuǎn", meaning: "Plot twist", mongolian: "Эргэлт" },
+            { char: "塌房", pinyin: "tā fáng", meaning: "Idol scandal", mongolian: "Одны муудал" },
+            { char: "脱粉", pinyin: "tuō fěn", meaning: "Unstan", mongolian: "Дэмжихээ болих" },
+            { char: "爬墙", pinyin: "pá qiáng", meaning: "Change fandom", mongolian: "Өөр од руу" },
+            { char: "颜值", pinyin: "yán zhí", meaning: "Appearance level", mongolian: "Царай" },
+            { char: "气质", pinyin: "qì zhì", meaning: "Vibe/Aura", mongolian: "Уур амьсгал" },
+            { char: "接地气", pinyin: "jiē dì qì", meaning: "Down to earth", mongolian: "Энгийн" },
+            { char: "不讲武德", pinyin: "bù jiǎng wǔ dé", meaning: "No fair play", mongolian: "Шударга бус" },
+            { char: "就离谱", pinyin: "jiù lí pǔ", meaning: "That's ridiculous", mongolian: "Утгагүй юм" },
+            { char: "栓Q", pinyin: "shuān Q", meaning: "Thank you (sarcastic)", mongolian: "Баярлалаа" },
+            { char: "夺笋", pinyin: "duó sǔn", meaning: "So mean", mongolian: "Хэцүү" },
+            { char: "拿捏", pinyin: "ná niē", meaning: "Nailed it", mongolian: "Амжилттай" }
+        ];
+
+        // Stories with character-level pinyin
+        const stories = {
+            1: {
+                title: "📖 My Day (我的一天)",
+                chars: [
+                    {c:"我",p:"wǒ"},{c:"叫",p:"jiào"},{c:"小",p:"xiǎo"},{c:"明",p:"míng"},{c:"。",p:""},
+                    {c:"今",p:"jīn"},{c:"天",p:"tiān"},{c:"是",p:"shì"},{c:"星",p:"xīng"},{c:"期",p:"qī"},{c:"一",p:"yī"},{c:"。",p:""},
+                    {c:"我",p:"wǒ"},{c:"早",p:"zǎo"},{c:"上",p:"shang"},{c:"六",p:"liù"},{c:"点",p:"diǎn"},{c:"起",p:"qǐ"},{c:"床",p:"chuáng"},{c:"。",p:""},
+                    {c:"我",p:"wǒ"},{c:"吃",p:"chī"},{c:"早",p:"zǎo"},{c:"饭",p:"fàn"},{c:"，",p:""},{c:"喝",p:"hē"},{c:"茶",p:"chá"},{c:"。",p:""},
+                    {c:"然",p:"rán"},{c:"后",p:"hòu"},{c:"我",p:"wǒ"},{c:"去",p:"qù"},{c:"学",p:"xué"},{c:"校",p:"xiào"},{c:"。",p:""},
+                    {c:"我",p:"wǒ"},{c:"是",p:"shì"},{c:"学",p:"xué"},{c:"生",p:"sheng"},{c:"。",p:""},
+                    {c:"老",p:"lǎo"},{c:"师",p:"shī"},{c:"很",p:"hěn"},{c:"好",p:"hǎo"},{c:"。",p:""},
+                    {c:"下",p:"xià"},{c:"午",p:"wǔ"},{c:"我",p:"wǒ"},{c:"看",p:"kàn"},{c:"书",p:"shū"},{c:"，",p:""},{c:"写",p:"xiě"},{c:"字",p:"zì"},{c:"。",p:""},
+                    {c:"晚",p:"wǎn"},{c:"上",p:"shang"},{c:"我",p:"wǒ"},{c:"回",p:"huí"},{c:"家",p:"jiā"},{c:"。",p:""},
+                    {c:"我",p:"wǒ"},{c:"爱",p:"ài"},{c:"我",p:"wǒ"},{c:"的",p:"de"},{c:"家",p:"jiā"},{c:"。",p:""}
+                ],
+                translation: "My name is Xiao Ming. Today is Monday. I wake up at 6am. I eat breakfast and drink tea. Then I go to school. I am a student. The teacher is good. In the afternoon I read and write. In the evening I go home. I love my home.",
+                translationMn: "Намайг Сяо Мин гэдэг. Өнөөдөр даваа гараг. Би өглөө 6 цагт босдог. Би өглөөний хоол идэж, цай уудаг. Дараа нь би сургууль руу явдаг. Би оюутан. Багш маш сайн. Үдээс хойш би ном уншиж, бичдэг. Орой би гэртээ харьдаг. Би гэр бүлээ хайрладаг."
+            },
+            2: {
+                title: "📖 My Decision (我的决定)",
+                chars: [
+                    {c:"因",p:"yīn"},{c:"为",p:"wèi"},{c:"我",p:"wǒ"},{c:"喜",p:"xǐ"},{c:"欢",p:"huān"},{c:"中",p:"zhōng"},{c:"文",p:"wén"},{c:"，",p:""},
+                    {c:"所",p:"suǒ"},{c:"以",p:"yǐ"},{c:"我",p:"wǒ"},{c:"决",p:"jué"},{c:"定",p:"dìng"},{c:"去",p:"qù"},{c:"中",p:"zhōng"},{c:"国",p:"guó"},{c:"。",p:""},
+                    {c:"虽",p:"suī"},{c:"然",p:"rán"},{c:"很",p:"hěn"},{c:"难",p:"nán"},{c:"，",p:""},
+                    {c:"但",p:"dàn"},{c:"是",p:"shì"},{c:"我",p:"wǒ"},{c:"希",p:"xī"},{c:"望",p:"wàng"},{c:"成",p:"chéng"},{c:"功",p:"gōng"},{c:"。",p:""},
+                    {c:"这",p:"zhè"},{c:"很",p:"hěn"},{c:"重",p:"zhòng"},{c:"要",p:"yào"},{c:"。",p:""}
+                ],
+                translation: "Because I like Chinese, I decided to go to China. Although it's difficult, I hope to succeed. This is very important.",
+                translationMn: "Би хятад хэлд дуртай болохоор Хятад руу явахаар шийдсэн. Хэдийгээр хэцүү ч амжилт олохыг найдаж байна. Энэ маш чухал."
+            },
+            3: {
+                title: "📖 Work Experience (工作经验)",
+                chars: [
+                    {c:"其",p:"qí"},{c:"实",p:"shí"},{c:"，",p:""},
+                    {c:"关",p:"guān"},{c:"于",p:"yú"},{c:"工",p:"gōng"},{c:"作",p:"zuò"},{c:"，",p:""},
+                    {c:"经",p:"jīng"},{c:"验",p:"yàn"},{c:"很",p:"hěn"},{c:"重",p:"zhòng"},{c:"要",p:"yào"},{c:"。",p:""},
+                    {c:"无",p:"wú"},{c:"论",p:"lùn"},{c:"情",p:"qíng"},{c:"况",p:"kuàng"},{c:"如",p:"rú"},{c:"何",p:"hé"},{c:"，",p:""},
+                    {c:"方",p:"fāng"},{c:"法",p:"fǎ"},{c:"是",p:"shì"},{c:"关",p:"guān"},{c:"键",p:"jiàn"},{c:"。",p:""},
+                    {c:"我",p:"wǒ"},{c:"支",p:"zhī"},{c:"持",p:"chí"},{c:"你",p:"nǐ"},{c:"。",p:""}
+                ],
+                translation: "Actually, regarding work, experience is important. No matter the situation, method is key. I support you.",
+                translationMn: "Үнэндээ, ажлын хувьд туршлага чухал. Байдал ямар ч байсан, арга бол гол зүйл. Би чамайг дэмжинэ."
+            },
+            4: {
+                title: "📖 Life Attitude (生活态度)",
+                chars: [
+                    {c:"尽",p:"jǐn"},{c:"管",p:"guǎn"},{c:"生",p:"shēng"},{c:"活",p:"huó"},{c:"很",p:"hěn"},{c:"难",p:"nán"},{c:"，",p:""},
+                    {c:"态",p:"tài"},{c:"度",p:"dù"},{c:"很",p:"hěn"},{c:"重",p:"zhòng"},{c:"要",p:"yào"},{c:"。",p:""},
+                    {c:"显",p:"xiǎn"},{c:"然",p:"rán"},{c:"，",p:""},
+                    {c:"逐",p:"zhú"},{c:"渐",p:"jiàn"},{c:"我",p:"wǒ"},{c:"们",p:"men"},{c:"会",p:"huì"},{c:"成",p:"chéng"},{c:"功",p:"gōng"},{c:"。",p:""},
+                    {c:"甚",p:"shèn"},{c:"至",p:"zhì"},{c:"更",p:"gèng"},{c:"好",p:"hǎo"},{c:"！",p:""}
+                ],
+                translation: "Despite life being hard, attitude is important. Obviously, gradually we will succeed. Even better!",
+                translationMn: "Амьдрал хэцүү ч хандлага чухал. Мэдээж, бид аажмаар амжилт олно. Бүр илүү сайн!"
+            }
+        };
+
+        // Initialize
+        function init() {
+            // TEST MODE: Unlock all levels (remove this line for production)
+            unlockedLevels = [1, 2, 3, 4];
+            localStorage.setItem('unlockedLevels', JSON.stringify(unlockedLevels));
+
+            if (!learnedWords[currentLevel]) learnedWords[currentLevel] = [];
+            initSlang();
+            updateUI();
+            showWord(currentIndex);
+            updateLevelButtons();
+        }
+
+        // Slang Functions
+        function initSlang() {
+            // Get 3 random slang that are not learned
+            if (currentSlangIndices.length === 0) {
+                refreshSlangIndices();
+            }
+            renderSlangSidebar();
+            updateSlangBankCount();
+        }
+
+        function refreshSlangIndices() {
+            currentSlangIndices = [];
+            const unlearnedIndices = slangWords.map((_, i) => i).filter(i => !slangBank.includes(slangWords[i].char));
+            while (currentSlangIndices.length < 3 && unlearnedIndices.length > 0) {
+                const randIdx = Math.floor(Math.random() * unlearnedIndices.length);
+                currentSlangIndices.push(unlearnedIndices[randIdx]);
+                unlearnedIndices.splice(randIdx, 1);
+            }
+            localStorage.setItem('currentSlangIndices', JSON.stringify(currentSlangIndices));
+        }
+
+        function renderSlangSidebar() {
+            const container = document.getElementById('slangGrid');
+            if (!container) return;
+            container.innerHTML = currentSlangIndices.map(idx => {
+                const s = slangWords[idx];
+                return `<div class="slang-grid-item" onclick="speak('${s.char}')">
+                    <div class="slang-char">${s.char}</div>
+                    <div class="slang-pin">${s.pinyin}</div>
+                    <div class="slang-mean">${s.meaning}</div>
+                    <button class="slang-learn-btn" onclick="event.stopPropagation();learnSlang(${idx})">✓ Learned</button>
+                </div>`;
+            }).join('');
+        }
+
+        function learnSlang(idx) {
+            const char = slangWords[idx].char;
+            if (!slangBank.includes(char)) {
+                slangBank.push(char);
+                localStorage.setItem('slangBank', JSON.stringify(slangBank));
+            }
+            // Remove from current and add new one
+            currentSlangIndices = currentSlangIndices.filter(i => i !== idx);
+            // Add a new unlearned slang
+            const unlearnedIndices = slangWords.map((_, i) => i).filter(i =>
+                !slangBank.includes(slangWords[i].char) && !currentSlangIndices.includes(i)
+            );
+            if (unlearnedIndices.length > 0) {
+                const newIdx = unlearnedIndices[Math.floor(Math.random() * unlearnedIndices.length)];
+                currentSlangIndices.push(newIdx);
+            }
+            localStorage.setItem('currentSlangIndices', JSON.stringify(currentSlangIndices));
+            renderSlangSidebar();
+            updateSlangBankCount();
+        }
+
+        function updateSlangBankCount() {
+            document.getElementById('slangBankCount').textContent = slangBank.length;
+        }
+
+        function openSlangBank() {
+            document.getElementById('slangModal').classList.add('show');
+            renderSlangBankGrid();
+        }
+
+        function closeSlangBank() {
+            document.getElementById('slangModal').classList.remove('show');
+        }
+
+        function renderSlangBankGrid() {
+            const grid = document.getElementById('slangBankGrid');
+            const emptyMsg = document.getElementById('emptyBankMsg');
+            if (slangBank.length === 0) {
+                grid.innerHTML = '';
+                emptyMsg.style.display = 'block';
+            } else {
+                emptyMsg.style.display = 'none';
+                grid.innerHTML = slangBank.map(char => {
+                    const s = slangWords.find(w => w.char === char);
+                    return s ? `<div class="bank-card" onclick="speak('${s.char}')">
+                        <div class="char">${s.char}</div>
+                        <div class="pin">${s.pinyin}</div>
+                        <div class="mean">${s.meaning}</div>
+                    </div>` : '';
+                }).join('');
+            }
+        }
+
+        // Text-to-Speech
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'zh-CN';
+                u.rate = 0.8;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        function speakChar() {
+            speak(hskWords[currentLevel][currentIndex].char);
+        }
+
+        function speakExample() {
+            speak(hskWords[currentLevel][currentIndex].example);
+        }
+
+        // Story Pinyin Toggle
+        function toggleStoryPinyin() {
+            showStoryPinyin = !showStoryPinyin;
+            document.getElementById('storyPinyinToggle').classList.toggle('active', showStoryPinyin);
+            renderStory();
+        }
+
+        // Word Display
+        function showWord(index) {
+            const words = hskWords[currentLevel];
+            if (!words || !words[index]) return;
+            const word = words[index];
+
+            document.getElementById('wordImage').textContent = word.image;
+            document.getElementById('chineseChar').textContent = word.char;
+            document.getElementById('pinyin').textContent = word.pinyin;
+            document.getElementById('english').textContent = '🇬🇧 ' + word.english;
+            document.getElementById('mongolian').textContent = '🇲🇳 ' + word.mongolian;
+            document.getElementById('exampleChinese').textContent = word.example;
+            document.getElementById('examplePinyin').textContent = word.exPinyin;
+            document.getElementById('exampleEnglish').textContent = word.exEnglish;
+            document.getElementById('wordCounter').textContent = `${index + 1} / ${words.length}`;
+
+            initWriters(word.char);
+        }
+
+        function nextWord() {
+            const words = hskWords[currentLevel];
+            currentIndex = (currentIndex + 1) % words.length;
+            showWord(currentIndex);
+        }
+
+        function prevWord() {
+            const words = hskWords[currentLevel];
+            currentIndex = (currentIndex - 1 + words.length) % words.length;
+            showWord(currentIndex);
+        }
+
+        function markLearned() {
+            const char = hskWords[currentLevel][currentIndex].char;
+            if (!learnedWords[currentLevel].includes(char)) {
+                learnedWords[currentLevel].push(char);
+                localStorage.setItem('hskLearned', JSON.stringify(learnedWords));
+                updateUI();
+            }
+            nextWord();
+        }
+
+        // Writer - supports multiple characters
+        let writers = [];
+
+        function initWriters(word) {
+            const container = document.getElementById('stroke-container');
+            container.innerHTML = '';
+            writers = [];
+
+            const chars = word.split('');
+            chars.forEach((char, idx) => {
+                const box = document.createElement('div');
+                box.className = 'stroke-box';
+                box.id = `stroke-target-${idx}`;
+                box.innerHTML = `<span class="char-label">${char}</span>`;
+                container.appendChild(box);
+
+                try {
+                    const w = HanziWriter.create(`stroke-target-${idx}`, char, {
+                        width: 100, height: 100, padding: 5,
+                        showOutline: true, strokeAnimationSpeed: 1,
+                        strokeColor: '#667eea', radicalColor: '#764ba2'
+                    });
+                    writers.push(w);
+                } catch (e) {
+                    writers.push(null);
+                }
+            });
+        }
+
+        function animateAllStrokes() {
+            let delay = 0;
+            writers.forEach(w => {
+                if (w) {
+                    setTimeout(() => w.animateCharacter(), delay);
+                    delay += 1500;
+                }
+            });
+        }
+
+        function quizAllStrokes() {
+            writers.forEach(w => { if (w) w.quiz(); });
+        }
+
+        function resetAllStrokes() {
+            const word = hskWords[currentLevel][currentIndex].char;
+            initWriters(word);
+        }
+
+        // Legacy single char functions for backward compat
+        function initWriter(char) { initWriters(char); }
+        function animateStroke() { animateAllStrokes(); }
+        function quizStroke() { quizAllStrokes(); }
+        function resetStroke() { resetAllStrokes(); }
+
+        // Sections
+        function showSection(section) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            ['learnSection', 'storySection', 'quizSection', 'listSection', 'examSection'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+
+            if (section === 'learn') {
+                document.getElementById('learnSection').classList.remove('hidden');
+            } else if (section === 'story') {
+                document.getElementById('storySection').classList.remove('hidden');
+                renderStory();
+            } else if (section === 'quiz') {
+                document.getElementById('quizSection').classList.remove('hidden');
+                startQuiz();
+            } else if (section === 'list') {
+                document.getElementById('listSection').classList.remove('hidden');
+                renderWordList();
+            } else if (section === 'exam') {
+                document.getElementById('examSection').classList.remove('hidden');
+                prepareExam();
+            }
+        }
+
+        // Story with Ruby Pinyin on top
+        function renderStory() {
+            const story = stories[currentLevel];
+            if (!story) {
+                document.getElementById('storyTitle').innerHTML = '<span>Story coming soon...</span>';
+                return;
+            }
+
+            let html = '';
+            for (let item of story.chars) {
+                if (item.p !== undefined) {
+                    html += `<ruby class="story-char" onclick="speak('${item.c}')">
+                        ${item.c}<rt class="${showStoryPinyin ? '' : 'hidden'}">${item.p}</rt></ruby>`;
+                } else {
+                    html += item.c;
+                }
+            }
+            document.getElementById('storyText').innerHTML = html;
+            document.getElementById('storyTranslation').innerHTML = `<div class="translation-en">🇬🇧 ${story.translation}</div><div class="translation-mn">🇲🇳 ${story.translationMn}</div>`;
+        }
+
+        // Quiz
+        let quizIndex = 0, quizScore = 0, quizWords = [];
+
+        function startQuiz() {
+            document.getElementById('quizContent').classList.remove('hidden');
+            document.getElementById('quizResult').classList.add('hidden');
+            quizIndex = 0;
+            quizScore = 0;
+            quizWords = [...hskWords[currentLevel]].sort(() => Math.random() - 0.5).slice(0, 10);
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (quizIndex >= quizWords.length) {
+                showQuizResult();
+                return;
+            }
+            const word = quizWords[quizIndex];
+            document.getElementById('quizChar').textContent = word.char;
+            document.getElementById('quizProgress').textContent = quizIndex + 1;
+
+            let options = [word.english];
+            while (options.length < 4) {
+                const r = hskWords[currentLevel][Math.floor(Math.random() * hskWords[currentLevel].length)];
+                if (!options.includes(r.english)) options.push(r.english);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            document.getElementById('quizOptions').innerHTML = options.map(opt =>
+                `<button class="quiz-option" onclick="checkQuizAnswer(this, '${opt}', '${word.english}')">${opt}</button>`
+            ).join('');
+        }
+
+        function checkQuizAnswer(btn, selected, correct) {
+            document.querySelectorAll('.quiz-option').forEach(b => {
+                b.disabled = true;
+                if (b.textContent === correct) b.classList.add('correct');
+            });
+            if (selected === correct) quizScore++;
+            else btn.classList.add('wrong');
+            setTimeout(() => { quizIndex++; showQuizQuestion(); }, 1000);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizContent').classList.add('hidden');
+            document.getElementById('quizResult').classList.remove('hidden');
+            const pct = quizScore * 10;
+            document.getElementById('quizScore').textContent = `${quizScore}/10`;
+            document.getElementById('quizEmoji').textContent = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+            document.getElementById('quizMessage').textContent = pct >= 80 ? 'Excellent! 很好！' : pct >= 60 ? 'Good job! 不错！' : 'Keep practicing! 加油！';
+        }
+
+        // Word List with Numbers
+        function renderWordList() {
+            const words = hskWords[currentLevel];
+            const learned = learnedWords[currentLevel] || [];
+            document.getElementById('wordList').innerHTML = words.map((w, i) =>
+                `<div class="word-item ${learned.includes(w.char) ? 'learned' : ''}" onclick="currentIndex=${i};showWord(${i});showSection('learn');">
+                    <span class="num">${i + 1}</span>
+                    <div class="char">${w.char}</div>
+                    <div class="pin">${w.pinyin}</div>
+                </div>`
+            ).join('');
+        }
+
+        // Exam
+        let examIndex = 0, examScore = 0, examWords = [];
+
+        function prepareExam() {
+            const words = hskWords[currentLevel];
+            const learned = learnedWords[currentLevel] || [];
+            document.getElementById('examReadyCount').textContent = learned.length;
+            document.getElementById('examTotalCount').textContent = words.length;
+            document.getElementById('startExamBtn').disabled = learned.length < words.length;
+            document.getElementById('examContent').classList.add('hidden');
+            document.getElementById('examResult').classList.add('hidden');
+            document.getElementById('examStart').classList.remove('hidden');
+        }
+
+        function startExam() {
+            document.getElementById('examStart').classList.add('hidden');
+            document.getElementById('examContent').classList.remove('hidden');
+            document.getElementById('examResult').classList.add('hidden');
+            examIndex = 0;
+            examScore = 0;
+            examWords = [...hskWords[currentLevel]].sort(() => Math.random() - 0.5).slice(0, 20);
+            showExamQuestion();
+        }
+
+        function showExamQuestion() {
+            if (examIndex >= examWords.length) {
+                showExamResult();
+                return;
+            }
+            const word = examWords[examIndex];
+            document.getElementById('examChar').textContent = word.char;
+            document.getElementById('examProgress').textContent = examIndex + 1;
+
+            let options = [word.english];
+            while (options.length < 4) {
+                const r = hskWords[currentLevel][Math.floor(Math.random() * hskWords[currentLevel].length)];
+                if (!options.includes(r.english)) options.push(r.english);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            document.getElementById('examOptions').innerHTML = options.map(opt =>
+                `<button class="quiz-option" onclick="checkExamAnswer(this, '${opt}', '${word.english}')">${opt}</button>`
+            ).join('');
+        }
+
+        function checkExamAnswer(btn, selected, correct) {
+            document.querySelectorAll('#examOptions .quiz-option').forEach(b => {
+                b.disabled = true;
+                if (b.textContent === correct) b.classList.add('correct');
+            });
+            if (selected === correct) examScore++;
+            else btn.classList.add('wrong');
+            setTimeout(() => { examIndex++; showExamQuestion(); }, 1000);
+        }
+
+        function showExamResult() {
+            document.getElementById('examContent').classList.add('hidden');
+            document.getElementById('examResult').classList.remove('hidden');
+            const pct = Math.round((examScore / 20) * 100);
+            document.getElementById('examScore').textContent = `${pct}%`;
+
+            if (pct >= 80) {
+                document.getElementById('examEmoji').textContent = '🎓';
+                document.getElementById('examMessage').textContent = `Congratulations! You passed HSK${currentLevel}!`;
+                document.getElementById('examRetryBtn').classList.add('hidden');
+                document.getElementById('examNextBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('examEmoji').textContent = '📚';
+                document.getElementById('examMessage').textContent = `You need 80% to pass. Keep studying!`;
+                document.getElementById('examRetryBtn').classList.remove('hidden');
+                document.getElementById('examNextBtn').classList.add('hidden');
+            }
+        }
+
+        function unlockNextLevel() {
+            const next = currentLevel + 1;
+            if (next <= 4 && !unlockedLevels.includes(next)) {
+                unlockedLevels.push(next);
+                localStorage.setItem('unlockedLevels', JSON.stringify(unlockedLevels));
+                updateLevelButtons();
+                selectLevel(next);
+            }
+        }
+
+        // Levels
+        function selectLevel(level) {
+            if (!unlockedLevels.includes(level)) {
+                alert(`Complete HSK${level-1} exam with 80% to unlock!`);
+                return;
+            }
+            currentLevel = level;
+            currentIndex = 0;
+            if (!learnedWords[level]) learnedWords[level] = [];
+            updateUI();
+            showWord(0);
+            updateLevelButtons();
+        }
+
+        function updateLevelButtons() {
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`level${i}Btn`);
+                btn.classList.remove('active', 'locked', 'unlocked');
+
+                if (i === currentLevel) {
+                    btn.classList.add('active');
+                } else if (unlockedLevels.includes(i)) {
+                    btn.classList.add('unlocked');
+                } else {
+                    btn.classList.add('locked');
+                }
+
+                const lockIcon = btn.querySelector('.lock-icon');
+                if (lockIcon) lockIcon.style.display = unlockedLevels.includes(i) ? 'none' : 'block';
+
+                const progress = btn.querySelector('.level-progress');
+                if (unlockedLevels.includes(i)) {
+                    const words = hskWords[i] || [];
+                    const learned = learnedWords[i] || [];
+                    const pct = words.length ? Math.round((learned.length / words.length) * 100) : 0;
+                    progress.textContent = `${pct}%`;
+                }
+            }
+        }
+
+        // UI Update
+        function updateUI() {
+            const words = hskWords[currentLevel] || [];
+            const learned = learnedWords[currentLevel] || [];
+            const pct = words.length ? Math.round((learned.length / words.length) * 100) : 0;
+
+            document.getElementById('headerTitle').textContent = `HSK${currentLevel}`;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct + '%';
+            document.getElementById('learnedCount').textContent = `${learned.length} learned`;
+            document.getElementById('totalWords').textContent = `/ ${words.length} words`;
+            document.getElementById(`level${currentLevel}Progress`).textContent = pct + '%';
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
